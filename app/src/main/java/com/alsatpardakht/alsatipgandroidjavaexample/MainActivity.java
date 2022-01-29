@@ -19,7 +19,7 @@ import com.alsatpardakht.ipg.data.remote.model.PaymentSignRequest;
 
 public class MainActivity extends AppCompatActivity implements PaymentSignCallback, PaymentValidationCallback {
 
-    private final String API = "09144137673";
+    private final String API = "ENTER YOUR API KEY HERE";
 
     private final AlsatIPG alsatIPG = AlsatIPG.getInstance(this, this);
 

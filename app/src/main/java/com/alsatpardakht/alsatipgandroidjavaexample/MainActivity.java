@@ -93,10 +93,10 @@ public class MainActivity extends AppCompatActivity implements PaymentSignCallba
 
     private void signPaymentButtonOnClick() {
         PaymentSignRequest paymentSignRequest = new PaymentSignRequest(
-                API,
-                "10000",
-                "12345",
-                "http://www.example.com/some_path"
+                API,//Api
+                "10000",//Amount
+                "12345",//InvoiceNumber
+                "http://www.example.com/some_path"//RedirectAddress
         );
         alsatIPG.sign(paymentSignRequest);
     }

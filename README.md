@@ -30,7 +30,6 @@
 - [درباره](#about)
 - [نحوه استفاده](#usage)
 - [ساخته شده با استفاده از](#built_using)
-- [نویسندگان](#authors)
 
 ## 🧐 درباره <a name = "about"></a>
 <p dir="rtl">
@@ -323,15 +322,3 @@ api آل سات پرداخت در وب سایت خود اعتبار پرداخت
 
 - [Java](https://www.java.com/) - programming language
 - [AlsatIPGAndroid](https://github.com/AlsatPardakht/AlsatIPGAndroid) - payment client library
-
-<div dir="rtl">
-
-## ✍️ نویسندگان <a name = "authors"></a>
-
-- [@erfanmhat](https://github.com/erfanmhat) - توسعه دهنده اندروید
-
-
-
-لیست [دیگر توسعه دهندگان](https://github.com/AlsatPardakht/AlsatIPGAndroidJavaExample/contributors)
-که در این پروژه مشارکت کرده اند .
-</div>

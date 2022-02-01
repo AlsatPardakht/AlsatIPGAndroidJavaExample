@@ -101,46 +101,62 @@ android:launchMode="singleTask"
 
 <br>
 
-### مرحله دوم : پیاده سازی اینترفیس ها
-در این مرحله کافی است اکتیویتی یا فرگمنت ( یا view model و یا هر کلاس دلخواه دیگر ) شما از اینترفیس های PaymentSignCallback و PaymentValidationCallback را پیاده سازی کند که هر یک دارای یک تابع است که باید پیاده سازی شود :
+### مرحله دوم : ساختن نمونه از کلاس AlsatIPG
+
+با استفاده از دستور زیر می توانید یک نمونه از کلاس AlsatIPG بسازید و با کمک این نمونه کار های پرداخت را انجام دهید :
+</div>
+
+```Java
+private final AlsatIPG alsatIPG = AlsatIPG.getInstance();
+```
+
+<div dir="rtl">
+<br>
+
+### مرحله سوم : پیاده سازی observer ها
+در این مرحله کافی است اکتیویتی یا فرگمنت  شما از LiveData های PaymentSignStatus و PaymentValidationStatus را observe کند :
 
 </div>
 
 ```Java
-public class MainActivity extends AppCompatActivity implements PaymentSignCallback, PaymentValidationCallback {
+public class MainActivity extends AppCompatActivity {
 
     @Override
-    public void onPaymentSignResult(@NonNull PaymentSignResult paymentSignResult) {
-        
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
         ...
 
+        observeToPaymentSignStatus();
+        observeToPaymentValidationStatus();
     }
 
-    @Override
-    public void onPaymentValidationResult(@NonNull PaymentValidationResult paymentValidationResult) {
-        
-        ...
+    private void observeToPaymentSignStatus() {
+        alsatIPG.getPaymentSignStatus().observe(this, new Observer<PaymentSignResult>() {
+            @Override
+            public void onChanged(PaymentSignResult paymentSignResult) {
+                ...
+            }
+        });
+    }
 
+    private void observeToPaymentValidationStatus() {
+        alsatIPG.getPaymentValidationStatus().observe(this, new Observer<PaymentValidationResult>() {
+            @Override
+            public void onChanged(PaymentValidationResult paymentValidationResult) {
+                ...
+            }
+        });
     }
 
 }
 ```
 
 <div dir="rtl">
-این دو تابع نتیجه sign شدن پرداخت و validation پرداخت را به شما بر می گرداند .
+این دو LiveData نتیجه sign شدن پرداخت و validation پرداخت را به شما بر می گرداند .
 <br><br>
 
-### مرحله سوم : ساختن نمونه از کلاس AlsatIPG
-
-با استفاده از دستور زیر می توانید یک نمونه از کلاس AlsatIPG بسازید و با کمک این نمونه کار های پرداخت را انجام دهید :
-</div>
-
-```Java
-private final AlsatIPG alsatIPG = AlsatIPG.getInstance(this, this);
-```
-
-<div dir="rtl">
-<br>
 
 ### مرحله چهارم : sign کردن پرداخت
 برای شروع sign پرداخت کافی است یک نمونه از PaymentSignRequest بسازید و با کمک تابع sign موجود در کتابخانه پرداخت را انجام دهید :
@@ -166,29 +182,32 @@ alsatIPG.sign(paymentSignRequest);
 
 - مقدار RedirectAddress همان آدرس دیپ لینک به اکتیویتی شماست که در فایل AndroidManifest.xml وارد کردید .
 
-پس از فراخوانی تابع sign نتایج این فراخوانی از طریق تابع 
-onPaymentSignResult که پیاده سازی کرده بودید در دسترس است :
+پس از فراخوانی تابع sign نتایج این فراخوانی از طریق PaymentSignStatus که observe کرده بودید در دسترس است :
 
 </div>
 
 ```Java
-@Override
-public void onPaymentSignResult(@NonNull PaymentSignResult paymentSignResult) {
-    if (paymentSignResult.isSuccessful()) {
-        log("payment Sign Success url = " + paymentSignResult.getUrl());
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(paymentSignResult.getUrl()));
-        startActivity(intent);
-    } else if (paymentSignResult.isLoading()) {
-        log("payment Sign Loading ...");
-    } else {
-        log("payment Sign error = " + paymentSignResult.getErrorMessage());
-    }
+private void observeToPaymentSignStatus() {
+    alsatIPG.getPaymentSignStatus().observe(this, new Observer<PaymentSignResult>() {
+        @Override
+        public void onChanged(PaymentSignResult paymentSignResult) {
+            if (paymentSignResult.isSuccessful()) {
+                log("payment Sign Success url = " + paymentSignResult.getUrl());
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(paymentSignResult.getUrl()));
+                startActivity(intent);
+            } else if (paymentSignResult.isLoading()) {
+                log("payment Sign Loading ...");
+            } else if (paymentSignResult.getError() != null) {
+                log("payment Sign error = " + paymentSignResult.getError().getMessage());
+            }
+        }
+    });
 }
 ```
 
 <div dir="rtl">
 
-این تابع وضعیت های موفق بودن یا لودینگ یا ارور تابع sign را به شما تحویل می دهد .
+این observer وضعیت های موفق بودن یا لودینگ یا ارور تابع sign را به شما تحویل می دهد .
 <br>
 دقت کنید در زمان موفق بودن sign پرداخت شما باید با استفاده از url موجود در نتیجه یک صفحه وب برای هدایت شدن کاربر به صفحه پرداخت شاپرک باز کنید .
 <br>
@@ -228,34 +247,38 @@ protected void onNewIntent(Intent intent) {
 <br>
 پس از آن که کاربر پرداخت را به درستی انجام داد یا به هر دلیلی موفق به پرداخت نشد شاپرک کاربر را به آدرس RedirectAddress که در PaymentSignRequest وارد کرده بودید هدایت می کند و چون یک دیپ لینک به همین آدرس تعریف کرده اید باعث باز شدن اکتیویتی شما و فراخوانی تابع onNewIntent اکتیویتی شما و سپس فراخوانی شدن تابع validation می شود .
 <br>
-پس از فراخوانی تابع validation نتایج این فراخوانی از طریق تابع onPaymentValidationResult که پیاده سازی کرده بودید در دسترس است :
+پس از فراخوانی تابع validation نتایج این فراخوانی از طریق PaymentValidationStatus که observe کرده بودید در دسترس است :
 </div>
 
 ```Java
-@Override
-public void onPaymentValidationResult(@NonNull PaymentValidationResult paymentValidationResult) {
-    if (paymentValidationResult.isSuccessful()) {
-        log("payment Validation Success data = " + paymentValidationResult.getData());
-        if (
-                (paymentValidationResult.getData() != null) &&
-                        (paymentValidationResult.getData().getPSP().getIsSuccess()) &&
-                        (paymentValidationResult.getData().getVERIFY().getIsSuccess())
-        ) {
-            log("money transferred");
-        } else {
-            log("money has not been transferred");
+private void observeToPaymentValidationStatus() {
+    alsatIPG.getPaymentValidationStatus().observe(this, new Observer<PaymentValidationResult>() {
+        @Override
+        public void onChanged(PaymentValidationResult paymentValidationResult) {
+            if (paymentValidationResult.isSuccessful()) {
+                log("payment Validation Success data = " + paymentValidationResult.getData());
+                if (
+                        (paymentValidationResult.getData() != null) &&
+                                (paymentValidationResult.getData().getPSP().getIsSuccess()) &&
+                                (paymentValidationResult.getData().getVERIFY().getIsSuccess())
+                ) {
+                    log("money transferred");
+                } else {
+                    log("money has not been transferred");
+                }
+            } else if (paymentValidationResult.isLoading()) {
+                log("payment Validation Loading ...");
+            } else if (paymentValidationResult.getError() != null) {
+                log("payment Validation error = " + paymentValidationResult.getError().getMessage());
+            }
         }
-    } else if (paymentValidationResult.isLoading()) {
-        log("payment Validation Loading ...");
-    } else {
-        log("payment Validation error = " + paymentValidationResult.getErrorMessage());
-    }
+    });
 }
 ```
 
 <div dir="rtl">
 
-این تابع وضعیت های موفق بودن یا لودینگ یا ارور تابع validation را به شما تحویل می دهد .
+این observer وضعیت های موفق بودن یا لودینگ یا ارور تابع validation را به شما تحویل می دهد .
 <br>
 همچنین در زمانی که پرداخت موفق بوده تابع ()getData موجود در نتیجه اطلاعاتی در مورد پرداخت را به شما می دهد که می توانید از آن استفاده کنید .
 

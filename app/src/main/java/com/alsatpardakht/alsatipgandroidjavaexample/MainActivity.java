@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void observeToPaymentSignStatus() {
+    private void observeToPaymentSignStatus() {
         alsatIPG.getPaymentSignStatus().observe(this, new Observer<PaymentSignResult>() {
             @Override
             public void onChanged(PaymentSignResult paymentSignResult) {
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void observeToPaymentValidationStatus() {
+    private void observeToPaymentValidationStatus() {
         alsatIPG.getPaymentValidationStatus().observe(this, new Observer<PaymentValidationResult>() {
             @Override
             public void onChanged(PaymentValidationResult paymentValidationResult) {

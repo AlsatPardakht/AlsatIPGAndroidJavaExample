@@ -11,9 +11,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.alsatpardakht.alsatipgandroid.AlsatIPG;
-import com.alsatpardakht.alsatipgandroid.data.remote.model.PaymentSignRequest;
-import com.alsatpardakht.alsatipgandroid.domain.model.PaymentSignResult;
-import com.alsatpardakht.alsatipgandroid.domain.model.PaymentValidationResult;
+import com.alsatpardakht.alsatipgcore.data.remote.model.PaymentSignRequest;
+import com.alsatpardakht.alsatipgcore.domain.model.PaymentSignResult;
+import com.alsatpardakht.alsatipgcore.domain.model.PaymentValidationResult;
 
 public class MainActivity extends AppCompatActivity {
 

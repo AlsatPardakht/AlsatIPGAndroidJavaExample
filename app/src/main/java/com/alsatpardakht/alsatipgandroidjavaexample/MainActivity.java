@@ -11,15 +11,19 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.alsatpardakht.alsatipgandroid.AlsatIPG;
-import com.alsatpardakht.alsatipgcore.data.remote.model.PaymentSignRequest;
 import com.alsatpardakht.alsatipgcore.domain.model.PaymentSignResult;
+import com.alsatpardakht.alsatipgcore.domain.model.PaymentType;
 import com.alsatpardakht.alsatipgcore.domain.model.PaymentValidationResult;
+import com.alsatpardakht.alsatipgcore.domain.model.TashimModel;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     private final String API = "ENTER YOUR API KEY HERE";
+    private PaymentType paymentType = PaymentType.Mostaghim;
 
-    private final AlsatIPG alsatIPG = AlsatIPG.getInstance();
+    private final AlsatIPG alsatIPG = AlsatIPG.getInstance(false);
 
     private TextView logTextView;
     private Button signPaymentButton;
@@ -50,7 +54,11 @@ public class MainActivity extends AppCompatActivity {
             Uri data = intent.getData();
             if (data != null) {
                 log("intent and data is not null");
-                alsatIPG.validation(API, data);
+                if (paymentType == PaymentType.Mostaghim) {
+                    alsatIPG.validationMostaghim(API, data);
+                } else if (paymentType == PaymentType.Vaset) {
+                    alsatIPG.validationVaset(API, data);
+                }
             } else {
                 log("data is null");
             }
@@ -101,13 +109,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void signPaymentButtonOnClick() {
-        PaymentSignRequest paymentSignRequest = new PaymentSignRequest(
-                API,//Api
-                "10000",//Amount
-                "12345",//InvoiceNumber
-                "http://www.example.com/some_path"//RedirectAddress
-        );
-        alsatIPG.sign(paymentSignRequest);
+        if (paymentType == PaymentType.Mostaghim) {
+            alsatIPG.signMostaghim(
+                    API,//Api
+                    10_000,//Amount
+                    "12345",//InvoiceNumber
+                    "http://www.example.com/some_path"//RedirectAddress
+            );
+        } else if (paymentType == PaymentType.Vaset) {
+            alsatIPG.signVaset(
+                    API,//Api
+                    20_000,//Amount
+                    "http://www.example.com/some_path",//RedirectAddress
+                    new ArrayList<TashimModel>(),//Tashim
+                    "12345"//InvoiceNumber
+            );
+        }
     }
 
     private void log(String message) {

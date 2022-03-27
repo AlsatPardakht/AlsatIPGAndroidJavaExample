@@ -372,3 +372,4 @@ api آلسات پرداخت در وب سایت خود اعتبار پرداخت 
 
 - [Java](https://www.java.com/) - programming language
 - [AlsatIPGAndroid](https://github.com/AlsatPardakht/AlsatIPGAndroid) - payment client library
+- [AlsatIPGCore](https://github.com/AlsatPardakht/AlsatIPGCore) - payment core library
